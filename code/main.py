@@ -48,17 +48,41 @@ def add_spec(text):
     run.underline = True
 
 
-def add_foto(name):
-    name = name.lower()
-    pic = doc.add_picture(f"pictures/{name}.jpg", width=Cm(3), height=Cm(4))
-    last_paragraph = doc.paragraphs[-1]
-    last_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+def add_foto(names, oneperson=False):
+    if oneperson:
+        doc.add_picture(f"pictures/{names}.jpg", width=Cm(3), height=Cm(4))
+        last_paragraph = doc.paragraphs[-1]
+        last_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        name = doc.add_paragraph(names)
+        name.alignment = 1
+
+    else:
+        p = doc.add_paragraph()
+        for name in names:
+            name = name.lower()
+            p.add_run().add_picture(f"pictures/{name}.jpg", width=Cm(3), height=Cm(4))
+            p.add_run(" " * 7)
+            last_paragraph = doc.paragraphs[-1]
+            last_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p2 = doc.add_paragraph()
+        p2.alignment = 1
+        i = 0
+        for i in range(len(names)):
+            p2.add_run(names[i])
+            p2.add_run(" " * 7)
+            i += 1
 
 
+namen = ("Arno", "senne", "matthias")
 add_titel("practicum 1")
 add_titel(" ")
 add_titel("Proefondervinderlijk blal bla a boem de la kaka")
 add_spec("Het verslag van:")
-add_foto("Arno")
+add_foto(namen[0], True)
+add_spec("De groepsleden:")
+add_foto(namen)
+
+
+
 
 doc.save(fileName)
