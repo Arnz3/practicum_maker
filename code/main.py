@@ -7,6 +7,7 @@ from docx.enum.style import WD_STYLE_TYPE
 root = Tk()
 root.title("Practicum Maker")
 
+doc = Document()
 
 def add_titel(text):
     p = doc.add_paragraph()
@@ -51,7 +52,6 @@ def add_foto(names, oneperson=False):
         p2 = doc.add_paragraph()
         p2.alignment = 1
         p2.paragraph_format.space_after = Pt(0)
-        i = 0
         for i in range(len(names)):
             p2.add_run(names[i])
             p2.add_run(" " * 7)
@@ -64,8 +64,18 @@ def add_info(vraag, info):
     p.add_run(info)
 
 
+
 def create_doc():
-    doc = Document()
+    vak = vak_e.get()
+    pracNr = pracNr_e.get()
+    pracTitel = pracTitel_e.get()
+    #naam = naam.get()
+    #leden = leden_e.get()
+    datum = datum_e.get()
+    klas = klas_e.get()
+    jaar = jaar_e.get()
+    filename = filename_e.get() + ".docx"
+
     # --------   styles   --------
     # create style "Titel"
     Titel = doc.styles.add_style("Titel", WD_STYLE_TYPE.PARAGRAPH)
@@ -89,50 +99,77 @@ def create_doc():
     last_paragraph = doc.paragraphs[-1]
     last_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
     namen = ("Arno", "senne", "matthias")
-    add_titel("practicum 1")
-    add_titel("Proefondervinderlijk blal bla a boem de la kaka")
+    add_titel("practicum" + str(pracNr) + vak)
+    add_titel(pracTitel)
     add_spec("Het verslag van:")
     add_foto(namen[0], True)
     add_spec("De groepsleden:")
     add_foto(namen)
-    add_info("Datum van het practicum: ", "07/01/2020")
-    add_info("Klas: ", "4IW")
-    add_info("Vak: ", "Chemie")
-    add_info("Schooljaar: ", "2019 - 2020")
+    add_info("Datum van het practicum: ", datum)
+    add_info("Klas: ", klas)
+    add_info("Vak: ", vak)
+    add_info("Schooljaar: ", jaar)
     add_info("Leerkracht: ", "Ing. B. Aernoudt")
-    doc.save(fileName)
+    doc.save(filename)
 
 
-info = Label(root, text="Welkom bij Practicum Maker, Vul de gegevens in en druk dan op ...").pack()
+# --------- GUI ---------
 
+vak_l = Label(root, text="Vak:")
+vak_l.grid(row=0, column=0)
 vak_e = Entry(root, width=50)
-vak_e.pack()
+vak_e.grid(row=0, column=1)
 vak_e.insert(0, "Vak")
 
+pracNr_l = Label(root, text="Practicum Nummer:")
+pracNr_l.grid(row=1, column=0)
 pracNr_e = Entry(root, width=50)
-pracNr_e.pack()
+pracNr_e.grid(row=1, column=1)
 pracNr_e.insert(0, "Practicum Nummer")
 
-pracTitel_e = Entry(root, width=100)
-pracTitel_e.pack()
+pracTitel_l = Label(root, text="Practicum Titel:")
+pracTitel_l.grid(row=2, column=0)
+pracTitel_e = Entry(root, width=50)
+pracTitel_e.grid(row=2, column=1)
 pracTitel_e.insert(0, "Practicum Titel")
 
+naam_l = Label(root, text="Eigen naam:")
+naam_l.grid(row=3, column=0)
 naam_e = Entry(root, width=50)
-naam_e.pack()
+naam_e.grid(row=3, column=1)
 naam_e.insert(0, "Naam + Voornaam")
 
-leden_e = Entry(root, width=100)
-leden_e.pack()
-leden_e.insert(0, "Groepsleden")
+leden_l = Label(root, text="Groepsleden:")
+leden_l.grid(row=4, column=0)
+leden_e = Entry(root, width=50)
+leden_e.grid(row=4, column=1)
+leden_e.insert(0, "Naam + Voornaam")
 
+datum_l = Label(root, text="Practicum Datum:")
+datum_l.grid(row=5, column=0)
 datum_e = Entry(root, width=50)
-datum_e.pack()
+datum_e.grid(row=5, column=1)
 datum_e.insert(0, "Datum van het practicum")
 
+klas_l = Label(root, text="Klas:")
+klas_l.grid(row=6, column=0)
 klas_e = Entry(root, width=50)
-klas_e.pack()
+klas_e.grid(row=6, column=1)
 klas_e.insert(0, "Klas")
 
+jaar_l = Label(root, text="Schooljaar:")
+jaar_l.grid(row=7, column=0)
 jaar_e = Entry(root, width=50)
-jaar_e.pack()
-jaar_e.insert(0, "Schooljaar")
+jaar_e.grid(row=7, column=1)
+jaar_e.insert(0, "2019 - 2020")
+
+filename_l = Label(root, text="bestandsnaam:")
+filename_l.grid(row=8, column=0)
+filename_e = Entry(root, width=50)
+filename_e.grid(row=8, column=1)
+filename_e.insert(0, "bestandsnaam")
+
+create = Button(root, text="Maak document!", command=create_doc)
+create.grid(row=9, column=1)
+
+root.mainloop()
