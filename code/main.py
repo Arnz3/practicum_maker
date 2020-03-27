@@ -9,6 +9,9 @@ root.title("Practicum Maker")
 
 doc = Document()
 
+leden_aantl = 1
+
+
 def add_titel(text):
     p = doc.add_paragraph()
     p.paragraph_format.space_after = Pt(0)
@@ -33,6 +36,7 @@ def add_foto(names, oneperson=False):
     if oneperson:
         p = doc.add_paragraph()
         p.paragraph_format.space_after = Pt(0)
+        names = names.lower()
         p.add_run().add_picture(f"pictures/{names}.jpg", width=Cm(3), height=Cm(4))
         last_paragraph = doc.paragraphs[-1]
         last_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -63,18 +67,59 @@ def add_info(vraag, info):
     p.add_run(vraag).bold = True
     p.add_run(info)
 
+def add_lid():
+    global leden_aantl
+    leden_aantl += 1
+    if leden_aantl == 2:
+        global lid2_e
+        lid2_e = Entry(root, width=50)
+        lid2_e.insert(0, "Naam + Voornaam")
+        lid2_e.grid(row=5, column=1, columnspan=2)
+    elif leden_aantl == 3:
+        global lid3_e
+        lid3_e = Entry(root, width=50)
+        lid3_e.insert(0, "Naam + Voornaam")
+        lid3_e.grid(row=6, column=1, columnspan=2)
+    elif leden_aantl == 4:
+        global lid4_e
+        lid4_e = Entry(root, width=50)
+        lid4_e.insert(0, "Naam + Voornaam")
+        lid4_e.grid(row=7, column=1, columnspan=2)
+    elif leden_aantl > 4:
+        leden_aantl = 4
+
+
+def del_lid():
+    global leden_aantl
+    leden_aantl -= 1
+    if leden_aantl == 3:
+        lid4_e.destroy()
+    elif leden_aantl == 2:
+        lid3_e.destroy()
+    elif leden_aantl == 1:
+        lid2_e.destroy()
+    elif leden_aantl < 1:
+        leden_aantl = 1
 
 
 def create_doc():
     vak = vak_e.get()
     pracNr = pracNr_e.get()
     pracTitel = pracTitel_e.get()
-    #naam = naam.get()
-    #leden = leden_e.get()
     datum = datum_e.get()
     klas = klas_e.get()
     jaar = jaar_e.get()
     filename = filename_e.get() + ".docx"
+
+    naam = naam_e.get()
+    if leden_aantl == 1:
+        namen = (naam, lid1_e.get())
+    elif leden_aantl == 2:
+        namen = (naam, lid1_e.get(), lid2_e.get())
+    elif leden_aantl == 3:
+        namen = (naam, lid1_e.get(), lid2_e.get(), lid3_e.get())
+    elif leden_aantl == 4:
+        namen = (naam, lid1_e.get(), lid2_e.get(), lid3_e.get(), lid4_e.get())
 
     # --------   styles   --------
     # create style "Titel"
@@ -98,7 +143,6 @@ def create_doc():
     logo = doc.add_picture("pictures\\logo_vti.jpg", width=Cm(5.66), height=Cm(3.59))
     last_paragraph = doc.paragraphs[-1]
     last_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    namen = ("Arno", "senne", "matthias")
     add_titel("practicum" + str(pracNr) + vak)
     add_titel(pracTitel)
     add_spec("Het verslag van:")
@@ -118,58 +162,63 @@ def create_doc():
 vak_l = Label(root, text="Vak:")
 vak_l.grid(row=0, column=0)
 vak_e = Entry(root, width=50)
-vak_e.grid(row=0, column=1)
+vak_e.grid(row=0, column=1, columnspan=2)
 vak_e.insert(0, "Vak")
 
 pracNr_l = Label(root, text="Practicum Nummer:")
 pracNr_l.grid(row=1, column=0)
 pracNr_e = Entry(root, width=50)
-pracNr_e.grid(row=1, column=1)
+pracNr_e.grid(row=1, column=1, columnspan=2)
 pracNr_e.insert(0, "Practicum Nummer")
 
 pracTitel_l = Label(root, text="Practicum Titel:")
 pracTitel_l.grid(row=2, column=0)
 pracTitel_e = Entry(root, width=50)
-pracTitel_e.grid(row=2, column=1)
+pracTitel_e.grid(row=2, column=1, columnspan=2)
 pracTitel_e.insert(0, "Practicum Titel")
 
 naam_l = Label(root, text="Eigen naam:")
 naam_l.grid(row=3, column=0)
 naam_e = Entry(root, width=50)
-naam_e.grid(row=3, column=1)
+naam_e.grid(row=3, column=1, columnspan=2)
 naam_e.insert(0, "Naam + Voornaam")
 
 leden_l = Label(root, text="Groepsleden:")
 leden_l.grid(row=4, column=0)
-leden_e = Entry(root, width=50)
-leden_e.grid(row=4, column=1)
-leden_e.insert(0, "Naam + Voornaam")
+lid1_e = Entry(root, width=50)
+lid1_e.grid(row=4, column=1, columnspan=2)
+lid1_e.insert(0, "Naam + Voornaam")
+
+add_lid = Button(root, text="+", command=add_lid)
+del_lid = Button(root, text="-", command=del_lid)
+add_lid.grid(row=8, column=1)
+del_lid.grid(row=8, column=2)
 
 datum_l = Label(root, text="Practicum Datum:")
-datum_l.grid(row=5, column=0)
+datum_l.grid(row=9, column=0)
 datum_e = Entry(root, width=50)
-datum_e.grid(row=5, column=1)
+datum_e.grid(row=9, column=1, columnspan=2)
 datum_e.insert(0, "Datum van het practicum")
 
 klas_l = Label(root, text="Klas:")
-klas_l.grid(row=6, column=0)
+klas_l.grid(row=10, column=0)
 klas_e = Entry(root, width=50)
-klas_e.grid(row=6, column=1)
+klas_e.grid(row=10, column=1, columnspan=2)
 klas_e.insert(0, "Klas")
 
 jaar_l = Label(root, text="Schooljaar:")
-jaar_l.grid(row=7, column=0)
+jaar_l.grid(row=11, column=0)
 jaar_e = Entry(root, width=50)
-jaar_e.grid(row=7, column=1)
+jaar_e.grid(row=11, column=1, columnspan=2)
 jaar_e.insert(0, "2019 - 2020")
 
 filename_l = Label(root, text="bestandsnaam:")
-filename_l.grid(row=8, column=0)
+filename_l.grid(row=12, column=0)
 filename_e = Entry(root, width=50)
-filename_e.grid(row=8, column=1)
+filename_e.grid(row=12, column=1, columnspan=2)
 filename_e.insert(0, "bestandsnaam")
 
 create = Button(root, text="Maak document!", command=create_doc)
-create.grid(row=9, column=1)
+create.grid(row=13, column=1)
 
 root.mainloop()
