@@ -10,7 +10,29 @@ root.title("Practicum Maker")
 doc = Document()
 
 leden_aantl = 1
+nr = 0
 
+# --------   styles   --------
+# create style "Titel"
+Titel = doc.styles.add_style("Titel", WD_STYLE_TYPE.PARAGRAPH)
+font = Titel.font
+font.name = "Verdana"
+font.size = Pt(20)
+
+# create style "Normal"
+Normal = doc.styles["Normal"]
+font1 = Normal.font
+font1.name = "Verdana"
+font1.size = Pt(12)
+
+# create style "specs"
+specs = doc.styles.add_style("specs", WD_STYLE_TYPE.PARAGRAPH)
+font2 = specs.font
+font2.name = "Verdana"
+font2.size = Pt(14)
+
+
+# -------------------------------
 
 def add_titel(text):
     p = doc.add_paragraph()
@@ -28,6 +50,18 @@ def add_spec(text):
     p.style = doc.styles["specs"]
     p.alignment = 1
     run = p.add_run(text)
+    run.bold = True
+    run.underline = True
+
+
+def add_kop(text):
+    global nr
+    nr += 1
+    p = doc.add_paragraph()
+    p.paragraph_format.space_after = Pt(0)
+    p.style = doc.styles["specs"]
+    p.alignment = 0
+    run = p.add_run(str(nr) + "." + text)
     run.bold = True
     run.underline = True
 
@@ -67,6 +101,7 @@ def add_info(vraag, info):
     p.add_run(vraag).bold = True
     p.add_run(info)
 
+
 def add_lid():
     global leden_aantl
     leden_aantl += 1
@@ -103,8 +138,9 @@ def del_lid():
 
 
 def create_doc():
+
     vak = vak_e.get()
-    pracNr = pracNr_e.get()
+    pracNr = str(pracNr_e.get()) + " "
     pracTitel = pracTitel_e.get()
     datum = datum_e.get()
     klas = klas_e.get()
@@ -121,29 +157,12 @@ def create_doc():
     elif leden_aantl == 4:
         namen = (naam, lid1_e.get(), lid2_e.get(), lid3_e.get(), lid4_e.get())
 
-    # --------   styles   --------
-    # create style "Titel"
-    Titel = doc.styles.add_style("Titel", WD_STYLE_TYPE.PARAGRAPH)
-    font = Titel.font
-    font.name = "Verdana"
-    font.size = Pt(20)
-
-    # create style "Normal"
-    Normal = doc.styles["Normal"]
-    font1 = Normal.font
-    font1.name = "Verdana"
-    font1.size = Pt(12)
-
-    # create style "specs"
-    specs = doc.styles.add_style("specs", WD_STYLE_TYPE.PARAGRAPH)
-    font2 = specs.font
-    font2.name = "Verdana"
-    font2.size = Pt(14)
-    # -------------------------------
-    logo = doc.add_picture("pictures\\logo_vti.jpg", width=Cm(5.66), height=Cm(3.59))
+    p = doc.add_paragraph()
+    p.paragraph_format.space_after = Pt(0)
+    p.add_run().add_picture("pictures/logo_vti.jpg", width=Cm(5.66), height=Cm(3.59))
     last_paragraph = doc.paragraphs[-1]
     last_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    add_titel("practicum" + str(pracNr) + vak)
+    add_titel("practicum " + str(pracNr) + vak)
     add_titel(pracTitel)
     add_spec("Het verslag van:")
     add_foto(namen[0], True)
@@ -154,6 +173,14 @@ def create_doc():
     add_info("Vak: ", vak)
     add_info("Schooljaar: ", jaar)
     add_info("Leerkracht: ", "Ing. B. Aernoudt")
+    doc.add_page_break()
+    add_kop("Doel van de proef")
+    add_kop("Benodigdheden")
+    add_kop("H- en P- zinnen en gevarensymbolen")
+    add_kop("Beschrijving, voorstelling en waarnemingen van de proef")
+    add_kop("Vragen")
+    add_kop("Berekeningen")
+    add_kop("Besluit")
     doc.save(filename)
 
 
