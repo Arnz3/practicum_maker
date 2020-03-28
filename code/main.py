@@ -7,32 +7,6 @@ from docx.enum.style import WD_STYLE_TYPE
 root = Tk()
 root.title("Practicum Maker")
 
-doc = Document()
-
-leden_aantl = 1
-nr = 0
-
-# --------   styles   --------
-# create style "Titel"
-Titel = doc.styles.add_style("Titel", WD_STYLE_TYPE.PARAGRAPH)
-font = Titel.font
-font.name = "Verdana"
-font.size = Pt(20)
-
-# create style "Normal"
-Normal = doc.styles["Normal"]
-font1 = Normal.font
-font1.name = "Verdana"
-font1.size = Pt(12)
-
-# create style "specs"
-specs = doc.styles.add_style("specs", WD_STYLE_TYPE.PARAGRAPH)
-font2 = specs.font
-font2.name = "Verdana"
-font2.size = Pt(14)
-
-
-# -------------------------------
 
 def add_titel(text):
     p = doc.add_paragraph()
@@ -138,6 +112,31 @@ def del_lid():
 
 
 def create_doc():
+    global doc
+    doc = Document()
+    global leden_aantl
+    leden_aantl = 1
+    global nr
+    nr = 0
+
+    # --------   styles   --------
+    # create style "Titel"
+    Titel = doc.styles.add_style("Titel", WD_STYLE_TYPE.PARAGRAPH)
+    font = Titel.font
+    font.name = "Verdana"
+    font.size = Pt(20)
+
+    # create style "Normal"
+    Normal = doc.styles["Normal"]
+    font1 = Normal.font
+    font1.name = "Verdana"
+    font1.size = Pt(12)
+
+    # create style "specs"
+    specs = doc.styles.add_style("specs", WD_STYLE_TYPE.PARAGRAPH)
+    font2 = specs.font
+    font2.name = "Verdana"
+    font2.size = Pt(14)
 
     vak = vak_e.get()
     pracNr = str(pracNr_e.get()) + " "
