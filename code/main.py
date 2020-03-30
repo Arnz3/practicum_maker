@@ -119,6 +119,7 @@ def create_doc():
     global nr
     nr = 0
 
+
     # --------   styles   --------
     # create style "Titel"
     Titel = doc.styles.add_style("Titel", WD_STYLE_TYPE.PARAGRAPH)
@@ -178,12 +179,16 @@ def create_doc():
     add_kop("H- en P- zinnen en gevarensymbolen")
     add_kop("Beschrijving, voorstelling en waarnemingen van de proef")
     add_kop("Vragen")
-    add_kop("Berekeningen")
+    if berekeningen:
+        add_kop("Berekeningen")
     add_kop("Besluit")
     doc.save(filename)
-
+    done = Label(root, text="Document klaar!")
+    done.grid(row=14, column=2)
 
 # --------- GUI ---------
+global berekeningen
+berekeningen = BooleanVar()
 
 vak_l = Label(root, text="Vak:")
 vak_l.grid(row=0, column=0)
@@ -238,13 +243,16 @@ jaar_e = Entry(root, width=50)
 jaar_e.grid(row=11, column=1, columnspan=2)
 jaar_e.insert(0, "2019 - 2020")
 
+ber = Checkbutton(root, text="Berekeningen", variable=berekeningen, onvalue=True, offvalue=False)
+ber.grid(row=12, column=1)
+
 filename_l = Label(root, text="bestandsnaam:")
-filename_l.grid(row=12, column=0)
+filename_l.grid(row=13, column=0)
 filename_e = Entry(root, width=50)
-filename_e.grid(row=12, column=1, columnspan=2)
+filename_e.grid(row=13, column=1, columnspan=2)
 filename_e.insert(0, "bestandsnaam")
 
 create = Button(root, text="Maak document!", command=create_doc)
-create.grid(row=13, column=1)
+create.grid(row=14, column=1)
 
 root.mainloop()
