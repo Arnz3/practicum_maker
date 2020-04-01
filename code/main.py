@@ -3,6 +3,8 @@ from tkinter import *
 from docx.shared import Pt, Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.style import WD_STYLE_TYPE
+from pathlib import Path
+import re
 
 root = Tk()
 root.title("Practicum Maker")
@@ -45,22 +47,32 @@ def add_foto(names, oneperson=False):
         p = doc.add_paragraph()
         p.paragraph_format.space_after = Pt(0)
         names = names.lower()
-        p.add_run().add_picture(f"pictures/{names}.jpg", width=Cm(3), height=Cm(4))
-        last_paragraph = doc.paragraphs[-1]
-        last_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        name = doc.add_paragraph(names)
-        name.alignment = 1
-        name.paragraph_format.space_after = Pt(0)
+        try:
+            p.add_run().add_picture(f"pictures/{names}.jpg", width=Cm(3), height=Cm(4))
+        except FileNotFoundError:
+            error = Label(root, text=f"Error, {names} zit niet in je klas!")
+            error.grid(row=15, column=1, columnspan=3)
+        else:
+            last_paragraph = doc.paragraphs[-1]
+            last_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            name = doc.add_paragraph(names)
+            name.alignment = 1
+            name.paragraph_format.space_after = Pt(0)
 
     else:
         p = doc.add_paragraph()
         p.paragraph_format.space_after = Pt(0)
         for name in names:
             name = name.lower()
-            p.add_run().add_picture(f"pictures/{name}.jpg", width=Cm(3), height=Cm(4))
-            p.add_run(" " * 7)
-            last_paragraph = doc.paragraphs[-1]
-            last_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            try:
+                p.add_run().add_picture(f"pictures/{name}.jpg", width=Cm(3), height=Cm(4))
+            except FileNotFoundError:
+                error = Label(root, text=f"Error, {name} zit niet in je klas")
+                error.grid(row=15, column=1, columnspan=3)
+            else:
+                p.add_run(" " * 7)
+                last_paragraph = doc.paragraphs[-1]
+                last_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
         p2 = doc.add_paragraph()
         p2.alignment = 1
         p2.paragraph_format.space_after = Pt(0)
@@ -111,16 +123,88 @@ def del_lid():
         leden_aantl = 1
 
 
+def check_info():
+    run = False
+    vak = vak_e.get()
+    prac_nr = prac_nr_e.get()
+    prac_titel = prac_titel_e.get()
+    datum = datum_e.get()
+    klas = klas_e.get()
+    jaar = jaar_e.get()
+    filename = filename_e.get() + ".docx"
+
+    try:
+        prac_nr = int(prac_nr)
+    except Exception:
+        error = Label(root, text=f"Error, {prac_nr} is geen geldig practicum nummer")
+        error.grid(row=15, column=1, columnspan=3)
+
+    naam = naam_e.get()
+    if leden_aantl == 1:
+        namen = (naam, lid1_e.get())
+    elif leden_aantl == 2:
+        namen = (naam, lid1_e.get(), lid2_e.get())
+    elif leden_aantl == 3:
+        namen = (naam, lid1_e.get(), lid2_e.get(), lid3_e.get())
+    elif leden_aantl == 4:
+        namen = (naam, lid1_e.get(), lid2_e.get(), lid3_e.get(), lid4_e.get())
+
+    klas_dir = Path(f"pictures/{klas}")
+    if klas_dir.is_dir():
+        for naam in namen:
+            naam = naam.lower() + ".jpg"
+            file = Path(f"pictures/{klas}/{naam}")
+            if file.is_file():
+                run = True
+            else:
+                error = Label(root, text=f"Error, {naam} zit niet in je klas")
+                error.grid(row=15, column=1, columnspan=3)
+                break
+    else:
+        error = Label(root, text=f"Error, {klas} zit nog niet in het systeem!")
+        error.grid(row=15, column=1, columnspan=3)  # error
+
+    if run:
+        datum_regex = re.compile(r"\d\d/\d\d/\d\d\d\d")
+        jaar_regex = re.compile(r"\d\d\d\d - \d\d\d\d")
+        if type(vak) == str:
+            if type(prac_titel) == str:
+                mo = datum_regex.search(datum)
+                if mo is not None:
+                    klas_dir = Path(f"pictures/{klas}")
+                    if klas_dir.is_dir():
+                        mo = jaar_regex.search(jaar)
+                        if mo is not None:
+                            file = Path(f"{filename}")
+                            if file.exists():
+                                error = Label(root, text=f"Error, {filename} is al een bestand")
+                                error.grid(row=15, column=1, columnspan=3)
+                            else:
+                                create_doc()
+                        else:
+                            error = Label(root, text=f"Error, {jaar} is geen geldig jaar")
+                            error.grid(row=15, column=1, columnspan=3)
+                    else:
+                        error = Label(root, text=f"Error, {klas} zit nog niet in het systeem")
+                        error.grid(row=15, column=1, columnspan=3)
+                else:
+                    error = Label(root, text=f"Error, {datum} is geen geldige datum")
+                    error.grid(row=15, column=1, columnspan=3)
+            else:
+                error = Label(root, text=f"Error, {prac_titel} is geen geldige Titel")
+                error.grid(row=15, column=1, columnspan=3)
+        else:
+            error = Label(root, text=f"Error, {vak} is geen vak!")
+            error.grid(row=15, column=1, columnspan=3)
+
+
 def create_doc():
     global doc
     doc = Document()
-    global leden_aantl
-    leden_aantl = 1
     global nr
     nr = 0
-
-
     # --------   styles   --------
+
     # create style "Titel"
     Titel = doc.styles.add_style("Titel", WD_STYLE_TYPE.PARAGRAPH)
     font = Titel.font
@@ -140,8 +224,8 @@ def create_doc():
     font2.size = Pt(14)
 
     vak = vak_e.get()
-    pracNr = str(pracNr_e.get()) + " "
-    pracTitel = pracTitel_e.get()
+    prac_nr = str(prac_nr_e.get()) + " "
+    prac_titel = prac_titel_e.get()
     datum = datum_e.get()
     klas = klas_e.get()
     jaar = jaar_e.get()
@@ -162,10 +246,10 @@ def create_doc():
     p.add_run().add_picture("pictures/logo_vti.jpg", width=Cm(5.66), height=Cm(3.59))
     last_paragraph = doc.paragraphs[-1]
     last_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    add_titel("practicum " + str(pracNr) + vak)
-    add_titel(pracTitel)
+    add_titel("practicum " + str(prac_nr) + vak)
+    add_titel(prac_titel)
     add_spec("Het verslag van:")
-    add_foto(namen[0], True)
+    add_foto(namen[0], True)  # todo doesn't add photo's any more
     add_spec("De groepsleden:")
     add_foto(namen)
     add_info("Datum van het practicum: ", datum)
@@ -179,16 +263,22 @@ def create_doc():
     add_kop("H- en P- zinnen en gevarensymbolen")
     add_kop("Beschrijving, voorstelling en waarnemingen van de proef")
     add_kop("Vragen")
-    if berekeningen:
+    global berekeningen
+    if berekeningen.get() == 1:
         add_kop("Berekeningen")
     add_kop("Besluit")
     doc.save(filename)
     done = Label(root, text="Document klaar!")
-    done.grid(row=14, column=2)
+    done.grid(row=15, column=1, columnspan=3)
+    root.after(7000)
+    done.destroy()
+
 
 # --------- GUI ---------
-global berekeningen
-berekeningen = BooleanVar()
+berekeningen = IntVar()
+
+global leden_aantl
+leden_aantl = 1
 
 vak_l = Label(root, text="Vak:")
 vak_l.grid(row=0, column=0)
@@ -196,17 +286,17 @@ vak_e = Entry(root, width=50)
 vak_e.grid(row=0, column=1, columnspan=2)
 vak_e.insert(0, "Vak")
 
-pracNr_l = Label(root, text="Practicum Nummer:")
-pracNr_l.grid(row=1, column=0)
-pracNr_e = Entry(root, width=50)
-pracNr_e.grid(row=1, column=1, columnspan=2)
-pracNr_e.insert(0, "Practicum Nummer")
+prac_nr_l = Label(root, text="Practicum Nummer:")
+prac_nr_l.grid(row=1, column=0)
+prac_nr_e = Entry(root, width=50)
+prac_nr_e.grid(row=1, column=1, columnspan=2)
+prac_nr_e.insert(0, "Practicum Nummer")
 
-pracTitel_l = Label(root, text="Practicum Titel:")
-pracTitel_l.grid(row=2, column=0)
-pracTitel_e = Entry(root, width=50)
-pracTitel_e.grid(row=2, column=1, columnspan=2)
-pracTitel_e.insert(0, "Practicum Titel")
+prac_titel_l = Label(root, text="Practicum Titel:")
+prac_titel_l.grid(row=2, column=0)
+prac_titel_e = Entry(root, width=50)
+prac_titel_e.grid(row=2, column=1, columnspan=2)
+prac_titel_e.insert(0, "Practicum Titel")
 
 naam_l = Label(root, text="Eigen naam:")
 naam_l.grid(row=3, column=0)
@@ -220,8 +310,8 @@ lid1_e = Entry(root, width=50)
 lid1_e.grid(row=4, column=1, columnspan=2)
 lid1_e.insert(0, "Naam + Voornaam")
 
-add_lid = Button(root, text="+", command=add_lid)
-del_lid = Button(root, text="-", command=del_lid)
+add_lid = Button(root, text="+", command=add_lid, width=5)
+del_lid = Button(root, text="-", command=del_lid, width=5)
 add_lid.grid(row=8, column=1)
 del_lid.grid(row=8, column=2)
 
@@ -243,7 +333,7 @@ jaar_e = Entry(root, width=50)
 jaar_e.grid(row=11, column=1, columnspan=2)
 jaar_e.insert(0, "2019 - 2020")
 
-ber = Checkbutton(root, text="Berekeningen", variable=berekeningen, onvalue=True, offvalue=False)
+ber = Checkbutton(root, text="Berekeningen", variable=berekeningen)
 ber.grid(row=12, column=1)
 
 filename_l = Label(root, text="bestandsnaam:")
@@ -252,7 +342,7 @@ filename_e = Entry(root, width=50)
 filename_e.grid(row=13, column=1, columnspan=2)
 filename_e.insert(0, "bestandsnaam")
 
-create = Button(root, text="Maak document!", command=create_doc)
+create = Button(root, text="Maak document!", command=check_info)
 create.grid(row=14, column=1)
 
 root.mainloop()
