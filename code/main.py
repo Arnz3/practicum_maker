@@ -6,8 +6,7 @@ from docx.enum.style import WD_STYLE_TYPE
 from pathlib import Path
 import re
 
-root = Tk()
-root.title("Practicum Maker")
+nr = 0
 
 
 def add_titel(text):
@@ -47,11 +46,12 @@ def add_foto(names, oneperson=False):
         p = doc.add_paragraph()
         p.paragraph_format.space_after = Pt(0)
         names = names.lower()
+        klas = klas_e.get()
         try:
-            p.add_run().add_picture(f"pictures/{names}.jpg", width=Cm(3), height=Cm(4))
+            p.add_run().add_picture(f"pictures/{klas}/{names}.jpg", width=Cm(3), height=Cm(4))
         except FileNotFoundError:
-            error = Label(root, text=f"Error, {names} zit niet in je klas!")
-            error.grid(row=15, column=1, columnspan=3)
+            error = Label(status, text=f"Error, {names} zit niet in je klas!")
+            error.pack()
         else:
             last_paragraph = doc.paragraphs[-1]
             last_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -62,13 +62,14 @@ def add_foto(names, oneperson=False):
     else:
         p = doc.add_paragraph()
         p.paragraph_format.space_after = Pt(0)
+        klas = klas_e.get()
         for name in names:
             name = name.lower()
             try:
-                p.add_run().add_picture(f"pictures/{name}.jpg", width=Cm(3), height=Cm(4))
+                p.add_run().add_picture(f"pictures/{klas}/{name}.jpg", width=Cm(3), height=Cm(4))
             except FileNotFoundError:
-                error = Label(root, text=f"Error, {name} zit niet in je klas")
-                error.grid(row=15, column=1, columnspan=3)
+                error = Label(status, text=f"Error, {name} zit niet in je klas")
+                error.pack()
             else:
                 p.add_run(" " * 7)
                 last_paragraph = doc.paragraphs[-1]
@@ -93,19 +94,16 @@ def add_lid():
     leden_aantl += 1
     if leden_aantl == 2:
         global lid2_e
-        lid2_e = Entry(root, width=50)
-        lid2_e.insert(0, "Naam + Voornaam")
-        lid2_e.grid(row=5, column=1, columnspan=2)
+        lid2_e = Entry(groep_frame)
+        lid2_e.place(relx=0.25, rely=0.4, relwidth=0.7)
     elif leden_aantl == 3:
         global lid3_e
-        lid3_e = Entry(root, width=50)
-        lid3_e.insert(0, "Naam + Voornaam")
-        lid3_e.grid(row=6, column=1, columnspan=2)
+        lid3_e = Entry(groep_frame)
+        lid3_e.place(relx=0.25, rely=0.6, relwidth=0.7)
     elif leden_aantl == 4:
         global lid4_e
-        lid4_e = Entry(root, width=50)
-        lid4_e.insert(0, "Naam + Voornaam")
-        lid4_e.grid(row=7, column=1, columnspan=2)
+        lid4_e = Entry(groep_frame)
+        lid4_e.place(relx=0.25, rely=0.8, relwidth=0.7)
     elif leden_aantl > 4:
         leden_aantl = 4
 
@@ -135,11 +133,12 @@ def check_info():
 
     try:
         prac_nr = int(prac_nr)
-    except Exception:
-        error = Label(root, text=f"Error, {prac_nr} is geen geldig practicum nummer")
-        error.grid(row=15, column=1, columnspan=3)
+    except ValueError:
+        error = Label(status, text=f"Error, {prac_nr} is geen geldig practicum nummer")
+        error.pack()
 
     naam = naam_e.get()
+    namen = naam
     if leden_aantl == 1:
         namen = (naam, lid1_e.get())
     elif leden_aantl == 2:
@@ -157,12 +156,12 @@ def check_info():
             if file.is_file():
                 run = True
             else:
-                error = Label(root, text=f"Error, {naam} zit niet in je klas")
-                error.grid(row=15, column=1, columnspan=3)
+                error = Label(status, text=f"Error, {naam} zit niet in je klas")
+                error.pack()
                 break
     else:
-        error = Label(root, text=f"Error, {klas} zit nog niet in het systeem!")
-        error.grid(row=15, column=1, columnspan=3)  # error
+        error = Label(status, text=f"Error, {klas} zit nog niet in het systeem!")
+        error.pack()
 
     if run:
         datum_regex = re.compile(r"\d\d/\d\d/\d\d\d\d")
@@ -177,43 +176,44 @@ def check_info():
                         if mo is not None:
                             file = Path(f"{filename}")
                             if file.exists():
-                                error = Label(root, text=f"Error, {filename} is al een bestand")
-                                error.grid(row=15, column=1, columnspan=3)
+                                error = Label(status, text=f"Error, {filename} is al een bestand")
+                                error.pack()
                             else:
                                 create_doc()
                         else:
-                            error = Label(root, text=f"Error, {jaar} is geen geldig jaar")
-                            error.grid(row=15, column=1, columnspan=3)
+                            error = Label(status, text=f"Error, {jaar} is geen geldig jaar")
+                            error.pack()
                     else:
-                        error = Label(root, text=f"Error, {klas} zit nog niet in het systeem")
-                        error.grid(row=15, column=1, columnspan=3)
+                        error = Label(status, text=f"Error, {klas} zit nog niet in het systeem")
+                        error.pack()
                 else:
-                    error = Label(root, text=f"Error, {datum} is geen geldige datum")
-                    error.grid(row=15, column=1, columnspan=3)
+                    error = Label(status, text=f"Error, {datum} is geen geldige datum")
+                    error.pack()
             else:
-                error = Label(root, text=f"Error, {prac_titel} is geen geldige Titel")
-                error.grid(row=15, column=1, columnspan=3)
+                error = Label(status, text=f"Error, {prac_titel} is geen geldige Titel")
+                error.pack()
         else:
-            error = Label(root, text=f"Error, {vak} is geen vak!")
-            error.grid(row=15, column=1, columnspan=3)
+            error = Label(status, text=f"Error, {vak} is geen vak!")
+            error.pack()
 
 
 def create_doc():
+    bussy = Label(status, text="creating document")
+    bussy.pack()
+    global nr
     global doc
     doc = Document()
-    global nr
-    nr = 0
     # --------   styles   --------
 
     # create style "Titel"
-    Titel = doc.styles.add_style("Titel", WD_STYLE_TYPE.PARAGRAPH)
-    font = Titel.font
+    titel = doc.styles.add_style("Titel", WD_STYLE_TYPE.PARAGRAPH)
+    font = titel.font
     font.name = "Verdana"
     font.size = Pt(20)
 
     # create style "Normal"
-    Normal = doc.styles["Normal"]
-    font1 = Normal.font
+    normal = doc.styles["Normal"]
+    font1 = normal.font
     font1.name = "Verdana"
     font1.size = Pt(12)
 
@@ -232,6 +232,7 @@ def create_doc():
     filename = filename_e.get() + ".docx"
 
     naam = naam_e.get()
+    namen = naam
     if leden_aantl == 1:
         namen = (naam, lid1_e.get())
     elif leden_aantl == 2:
@@ -249,7 +250,7 @@ def create_doc():
     add_titel("practicum " + str(prac_nr) + vak)
     add_titel(prac_titel)
     add_spec("Het verslag van:")
-    add_foto(namen[0], True)  # todo doesn't add photo's any more
+    add_foto(namen[0], True)
     add_spec("De groepsleden:")
     add_foto(namen)
     add_info("Datum van het practicum: ", datum)
@@ -268,81 +269,110 @@ def create_doc():
         add_kop("Berekeningen")
     add_kop("Besluit")
     doc.save(filename)
-    done = Label(root, text="Document klaar!")
-    done.grid(row=15, column=1, columnspan=3)
+    bussy.destroy()
+    done = Label(status, text="Document klaar!")
+    done.pack()
     root.after(7000)
     done.destroy()
 
 
 # --------- GUI ---------
+
+HEIGHT = 600
+WIDTH = 700
+
+root = Tk()
+root.title("Practicum Maker")
+
 berekeningen = IntVar()
 
-global leden_aantl
+canvas = Canvas(root, width=WIDTH, height=HEIGHT)
+canvas.pack()
+
+welcome_frame = Frame(root, bd=5)
+welcome_frame.place(relx=0.1, rely=0, relwidth=0.8, relheight=0.1)
+
+welcome = Label(welcome_frame, text="Welkom bij Practicum Maker. Vul de gegevens in om een practicum te maken")
+welcome.place(relwidth=0.75, relheight=1)
+
+helper = Button(welcome_frame, text="Help", state=DISABLED)
+helper.place(relx=0.8, rely=0, relwidth=0.2, relheight=0.8)
+
+# ----------   PRAC INFO   ----------
+
+info_frame = LabelFrame(root, text="Practicum Info", bd=5)
+info_frame.place(relx=0.1, rely=0.1, relwidth=0.8, relheight=0.3)
+
+vak_l = Label(info_frame, text="Vak:")
+vak_l.place(relx=0.02, rely=0, relwidth=0.2)
+vak_e = Entry(info_frame)
+vak_e.place(relx=0.25, rely=0, relwidth=0.7)
+
+prac_nr_l = Label(info_frame, text="Practicum Nummer:")
+prac_nr_l.place(relx=0.02, rely=0.14, relwidth=0.2)
+prac_nr_e = Entry(info_frame)
+prac_nr_e.place(relx=0.25, rely=0.14, relwidth=0.7)
+
+prac_titel_l = Label(info_frame, text="Practicum Titel:")
+prac_titel_l.place(relx=0.02, rely=0.28, relwidth=0.2)
+prac_titel_e = Entry(info_frame)
+prac_titel_e.place(relx=0.25, rely=0.28, relwidth=0.7)
+
+datum_l = Label(info_frame, text="Datum:")
+datum_l.place(relx=0.02, rely=0.42, relwidth=0.2)
+datum_e = Entry(info_frame)
+datum_e.place(relx=0.25, rely=0.42, relwidth=0.7)
+
+klas_l = Label(info_frame, text="Klas:")
+klas_l.place(relx=0.02, rely=0.56, relwidth=0.2)
+klas_e = Entry(info_frame)
+klas_e.place(relx=0.25, rely=0.56, relwidth=0.7)
+
+jaar_l = Label(info_frame, text="Schooljaar:")
+jaar_l.place(relx=0.02, rely=0.70, relwidth=0.2)
+jaar_e = Entry(info_frame)
+jaar_e.place(relx=0.25, rely=0.70, relwidth=0.7)
+
+ber = Checkbutton(info_frame, text="Berekeningen", variable=berekeningen)
+ber.place(relx=0.25, rely=0.84)
+
+# ----------   GROEP   ----------
 leden_aantl = 1
 
-vak_l = Label(root, text="Vak:")
-vak_l.grid(row=0, column=0)
-vak_e = Entry(root, width=50)
-vak_e.grid(row=0, column=1, columnspan=2)
-vak_e.insert(0, "Vak")
+groep_frame = LabelFrame(root, text="Groep", bd=5)
+groep_frame.place(relx=0.1, rely=0.4, relwidth=0.8, relheight=0.3, )
 
-prac_nr_l = Label(root, text="Practicum Nummer:")
-prac_nr_l.grid(row=1, column=0)
-prac_nr_e = Entry(root, width=50)
-prac_nr_e.grid(row=1, column=1, columnspan=2)
-prac_nr_e.insert(0, "Practicum Nummer")
+naam_l = Label(groep_frame, text="Eigen naam:")
+naam_l.place(relx=0.02, rely=0, relwidth=0.2)
+naam_e = Entry(groep_frame)
+naam_e.place(relx=0.25, rely=0, relwidth=0.7)
 
-prac_titel_l = Label(root, text="Practicum Titel:")
-prac_titel_l.grid(row=2, column=0)
-prac_titel_e = Entry(root, width=50)
-prac_titel_e.grid(row=2, column=1, columnspan=2)
-prac_titel_e.insert(0, "Practicum Titel")
+leden_l = Label(groep_frame, text="Groepsleden:")
+leden_l.place(relx=0.02, rely=0.2, relwidth=0.2)
+lid1_e = Entry(groep_frame)
+lid1_e.place(relx=0.25, rely=0.2, relwidth=0.7)
 
-naam_l = Label(root, text="Eigen naam:")
-naam_l.grid(row=3, column=0)
-naam_e = Entry(root, width=50)
-naam_e.grid(row=3, column=1, columnspan=2)
-naam_e.insert(0, "Naam + Voornaam")
+add = Button(groep_frame, text="+", command=add_lid)
+add.place(relx=0.02, rely=0.8, relwidth=0.1)
+sub = Button(groep_frame, text="-", command=del_lid)
+sub.place(relx=0.13, rely=0.8, relwidth=0.1)
 
-leden_l = Label(root, text="Groepsleden:")
-leden_l.grid(row=4, column=0)
-lid1_e = Entry(root, width=50)
-lid1_e.grid(row=4, column=1, columnspan=2)
-lid1_e.insert(0, "Naam + Voornaam")
+# ----------   BESTAND   ---------
 
-add_lid = Button(root, text="+", command=add_lid, width=5)
-del_lid = Button(root, text="-", command=del_lid, width=5)
-add_lid.grid(row=8, column=1)
-del_lid.grid(row=8, column=2)
+file_frame = LabelFrame(root, text="Bestand", bd=5)
+file_frame.place(relx=0.1, rely=0.7, relwidth=0.8, relheight=0.1)
 
-datum_l = Label(root, text="Practicum Datum:")
-datum_l.grid(row=9, column=0)
-datum_e = Entry(root, width=50)
-datum_e.grid(row=9, column=1, columnspan=2)
-datum_e.insert(0, "Datum van het practicum")
+filename_l = Label(file_frame, text="Bestandsnaam:")
+filename_l.place(relx=0.02, rely=0, relwidth=0.2)
+filename_e = Entry(file_frame)
+filename_e.place(relx=0.25, rely=0, relwidth=0.45)
 
-klas_l = Label(root, text="Klas:")
-klas_l.grid(row=10, column=0)
-klas_e = Entry(root, width=50)
-klas_e.grid(row=10, column=1, columnspan=2)
-klas_e.insert(0, "Klas")
+create_file = Button(file_frame, text="Maak Practicum", command=check_info)
+create_file.place(relx=0.75, rely=0, relwidth=0.2)
 
-jaar_l = Label(root, text="Schooljaar:")
-jaar_l.grid(row=11, column=0)
-jaar_e = Entry(root, width=50)
-jaar_e.grid(row=11, column=1, columnspan=2)
-jaar_e.insert(0, "2019 - 2020")
+# ----------   status   ----------
 
-ber = Checkbutton(root, text="Berekeningen", variable=berekeningen)
-ber.grid(row=12, column=1)
-
-filename_l = Label(root, text="bestandsnaam:")
-filename_l.grid(row=13, column=0)
-filename_e = Entry(root, width=50)
-filename_e.grid(row=13, column=1, columnspan=2)
-filename_e.insert(0, "bestandsnaam")
-
-create = Button(root, text="Maak document!", command=check_info)
-create.grid(row=14, column=1)
+status = LabelFrame(root, text="status", bd=5)
+status.place(relx=0.1, rely=0.8, relwidth=0.8)
 
 root.mainloop()
