@@ -7,9 +7,11 @@ from pathlib import Path
 import re
 
 nr = 0
+doc = Document()
 
 
 def add_titel(text):
+    global doc
     p = doc.add_paragraph()
     p.paragraph_format.space_after = Pt(0)
     p.style = doc.styles["Titel"]
@@ -20,6 +22,7 @@ def add_titel(text):
 
 
 def add_spec(text):
+    global doc
     p = doc.add_paragraph()
     p.paragraph_format.space_after = Pt(0)
     p.style = doc.styles["specs"]
@@ -31,6 +34,7 @@ def add_spec(text):
 
 def add_kop(text):
     global nr
+    global doc
     nr += 1
     p = doc.add_paragraph()
     p.paragraph_format.space_after = Pt(0)
@@ -42,6 +46,7 @@ def add_kop(text):
 
 
 def add_foto(names, oneperson=False):
+    global doc
     if oneperson:
         p = doc.add_paragraph()
         p.paragraph_format.space_after = Pt(0)
@@ -84,6 +89,7 @@ def add_foto(names, oneperson=False):
 
 
 def add_info(vraag, info):
+    global doc
     p = doc.add_paragraph()
     p.add_run(vraag).bold = True
     p.add_run(info)
@@ -112,10 +118,13 @@ def del_lid():
     global leden_aantl
     leden_aantl -= 1
     if leden_aantl == 3:
+        global lid4_e
         lid4_e.destroy()
     elif leden_aantl == 2:
+        global lid3_e
         lid3_e.destroy()
     elif leden_aantl == 1:
+        global lid2_e
         lid2_e.destroy()
     elif leden_aantl < 1:
         leden_aantl = 1
@@ -202,7 +211,6 @@ def create_doc():
     bussy.pack()
     global nr
     global doc
-    doc = Document()
     # --------   styles   --------
 
     # create style "Titel"
@@ -349,8 +357,13 @@ naam_e.place(relx=0.25, rely=0, relwidth=0.7)
 
 leden_l = Label(groep_frame, text="Groepsleden:")
 leden_l.place(relx=0.02, rely=0.2, relwidth=0.2)
+
 lid1_e = Entry(groep_frame)
 lid1_e.place(relx=0.25, rely=0.2, relwidth=0.7)
+
+lid2_e = Entry(groep_frame)
+lid3_e = Entry(groep_frame)
+lid4_e = Entry(groep_frame)
 
 add = Button(groep_frame, text="+", command=add_lid)
 add.place(relx=0.02, rely=0.8, relwidth=0.1)

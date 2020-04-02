@@ -8,12 +8,14 @@ def add_lid():
     global leden_aantl
     leden_aantl += 1
     if leden_aantl == 2:
-        lid2_e = Entry(groep_frame)
+        global lid2_e
         lid2_e.place(relx=0.25, rely=0.4, relwidth=0.7)
     elif leden_aantl == 3:
+        global lid3_e
         lid3_e = Entry(groep_frame)
         lid3_e.place(relx=0.25, rely=0.6, relwidth=0.7)
     elif leden_aantl == 4:
+        global lid4_e
         lid4_e = Entry(groep_frame)
         lid4_e.place(relx=0.25, rely=0.8, relwidth=0.7)
     elif leden_aantl > 4:
@@ -24,14 +26,19 @@ def del_lid():
     global leden_aantl
     leden_aantl -= 1
     if leden_aantl == 3:
-        lid4_e.destroy()
+        global lid4_e
+        lid4_e.place_forget()
     elif leden_aantl == 2:
-        lid3_e.destroy()
+        global lid3_e
+        lid3_e.place_forget()
     elif leden_aantl == 1:
-        lid2_e.destroy()
+        global lid2_e
+        lid2_e.place_forget()
     elif leden_aantl < 1:
         leden_aantl = 1
 
+
+# ----------   GUI   ----------
 
 root = Tk()
 
@@ -44,7 +51,7 @@ welcome_frame.place(relx=0.1, rely=0, relwidth=0.8, relheight=0.1)
 welcome = Label(welcome_frame, text="Welkom bij Practicum Maker. Vul de gegevens in om een practicum te maken")
 welcome.place(relwidth=0.75, relheight=1)
 
-helper = Button(welcome_frame, text="Help")
+helper = Button(welcome_frame, text="Help", state=DISABLED)
 helper.place(relx=0.8, rely=0, relwidth=0.2, relheight=0.8)
 
 # ----------   PRAC INFO   ----------
@@ -98,8 +105,13 @@ naam_e.place(relx=0.25, rely=0, relwidth=0.7)
 
 leden_l = Label(groep_frame, text="Groepsleden:")
 leden_l.place(relx=0.02, rely=0.2, relwidth=0.2)
+
 lid1_e = Entry(groep_frame)
 lid1_e.place(relx=0.25, rely=0.2, relwidth=0.7)
+
+lid2_e = Entry(groep_frame)
+lid3_e = Entry(groep_frame)
+lid4_e = Entry(groep_frame)
 
 add = Button(groep_frame, text="+", command=add_lid)
 add.place(relx=0.02, rely=0.8, relwidth=0.1)
@@ -111,12 +123,12 @@ sub.place(relx=0.13, rely=0.8, relwidth=0.1)
 file_frame = LabelFrame(root, text="Bestand", bd=5)
 file_frame.place(relx=0.1, rely=0.7, relwidth=0.8, relheight=0.1)
 
-bestand_l = Label(file_frame, text="Bestandsnaam:")
-bestand_l.place(relx=0.02, rely=0, relwidth=0.2)
-bestand_e = Entry(file_frame)
-bestand_e.place(relx=0.25, rely=0, relwidth=0.45)
+filename_l = Label(file_frame, text="Bestandsnaam:")
+filename_l.place(relx=0.02, rely=0, relwidth=0.2)
+filename_e = Entry(file_frame)
+filename_e.place(relx=0.25, rely=0, relwidth=0.45)
 
-create_file = Button(file_frame, text="Maak Practicum", command="")
+create_file = Button(file_frame, text="Maak Practicum", command='')
 create_file.place(relx=0.75, rely=0, relwidth=0.2)
 
 # ----------   ERRORS   ----------
