@@ -1,6 +1,7 @@
-from docx import *
 from tkinter import *
 from tkinter import filedialog
+from tkinter.filedialog import askopenfilename
+from docx import *
 from docx.shared import Pt, Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.style import WD_STYLE_TYPE
@@ -10,6 +11,7 @@ import re
 nr = 0
 path = ""
 doc = Document()
+voorb_f = "niets"
 
 # --------   styles   --------
 
@@ -160,6 +162,7 @@ def go_back():
     leden2_i.place_forget()
 
     filename_i.place_forget()
+    create_i.place_forget()
 
     helper.place(relx=0.8, rely=0, relwidth=0.2, relheight=0.8)
     vak_e.place(relx=0.25, rely=0, relwidth=0.7)
@@ -183,6 +186,8 @@ def go_back():
 
     filename_e.place(relx=0.25, rely=0, relwidth=0.45)
     path_b.place(relx=0.75, rely=0, relwidth=0.2)
+    voorb_b.place(relx=0.25, rely=0.5, relwidth=0.2)
+    create_file.place(relx=0.55, rely=0.5, relwidth=0.2)
 
 
 def show_help():
@@ -194,6 +199,8 @@ def show_help():
     klas_e.place_forget()
     jaar_e.place_forget()
     ber.place_forget()
+    create_file.place_forget()
+    voorb_b.place_forget()
 
     naam_e.place_forget()
     lid1_e.place_forget()
@@ -224,11 +231,31 @@ def show_help():
     leden2_i.place(relx=0.25, rely=0.5, relwidth=0.7)
 
     filename_i.place(relx=0.25, rely=0, relwidth=0.7)
+    create_i.place(relx=0.25, rely=0.5, relwidth=0.7)
 
 
 def get_path():
     global path
     path = filedialog.askdirectory()
+
+
+def get_voorb():
+    global voorb_f
+    voorb_f = askopenfilename(initialdir="C:/Users/User/Documents/",
+                              filetypes=(("Documents", "*.docx"), ("All Files", "*.*")),
+                              title="Kies een bestand."
+                              )
+
+
+def find_dvdp(path2):
+    doc2 = Document(path2)
+    i = 0
+    for paragraph in doc2.paragraphs:
+        i += 1
+        if "Doel van de proef" in paragraph.text:
+            break
+    dvdp = doc2.paragraphs[i].text
+    return dvdp
 
 
 def check_info():
@@ -276,34 +303,43 @@ def check_info():
     if run:
         datum_regex = re.compile(r"\d\d/\d\d/\d\d\d\d")
         jaar_regex = re.compile(r"\d\d\d\d - \d\d\d\d")
-        if type(vak) == str:
-            if type(prac_titel) == str:
-                mo = datum_regex.search(datum)
-                if mo is not None:
-                    klas_dir = Path(f"pictures/{klas}")
-                    if klas_dir.is_dir():
-                        mo = jaar_regex.search(jaar)
+        if voorb_f is not "niets":
+            voorb_path = Path(voorb_f)
+            if voorb_path.exists():
+                if type(vak) == str:
+                    if type(prac_titel) == str:
+                        mo = datum_regex.search(datum)
                         if mo is not None:
-                            file = Path(f"{filename}")
-                            if file.exists():
-                                error = Label(status, text=f"Error, {filename} is al een bestand")
-                                error.pack()
+                            klas_dir = Path(f"pictures/{klas}")
+                            if klas_dir.is_dir():
+                                mo = jaar_regex.search(jaar)
+                                if mo is not None:
+                                    file = Path(f"{filename}")
+                                    if file.exists():
+                                        error = Label(status, text=f"Error, {filename} is al een bestand")
+                                        error.pack()
+                                    else:
+                                        create_doc()
+                                else:
+                                    error = Label(status, text=f"Error, {jaar} is geen geldig jaar")
+                                    error.pack()
                             else:
-                                create_doc()
+                                error = Label(status, text=f"Error, {klas} zit nog niet in het systeem")
+                                error.pack()
                         else:
-                            error = Label(status, text=f"Error, {jaar} is geen geldig jaar")
+                            error = Label(status, text=f"Error, {datum} is geen geldige datum")
                             error.pack()
                     else:
-                        error = Label(status, text=f"Error, {klas} zit nog niet in het systeem")
+                        error = Label(status, text=f"Error, {prac_titel} is geen geldige Titel")
                         error.pack()
                 else:
-                    error = Label(status, text=f"Error, {datum} is geen geldige datum")
+                    error = Label(status, text=f"Error, {vak} is geen vak!")
                     error.pack()
             else:
-                error = Label(status, text=f"Error, {prac_titel} is geen geldige Titel")
+                error = Label(status, text=f"Error, De voorbereiding bestaat niet!")
                 error.pack()
         else:
-            error = Label(status, text=f"Error, {vak} is geen vak!")
+            error = Label(status, text=f"Error, Er is geen voobereiding geselecteerd!")
             error.pack()
 
 
@@ -351,6 +387,7 @@ def create_doc():
     add_info("Leerkracht: ", "Ing. B. Aernoudt")
     doc.add_page_break()
     add_kop("Doel van de proef")
+    doc.add_paragraph(find_dvdp(voorb_f))
     add_kop("Benodigdheden")
     add_kop("H- en P- zinnen en gevarensymbolen")
     add_kop("Beschrijving, voorstelling en waarnemingen van de proef")
@@ -467,8 +504,11 @@ filename_e.place(relx=0.25, rely=0, relwidth=0.45)
 path_b = Button(file_frame, text="locatie", command=get_path)
 path_b.place(relx=0.75, rely=0, relwidth=0.2)
 
+voorb_b = Button(file_frame, text="voorbereiding", command=get_voorb)
+voorb_b.place(relx=0.25, rely=0.5, relwidth=0.2)
+
 create_file = Button(file_frame, text="Maak Practicum", command=check_info)
-create_file.place(relx=0.4, rely=0.5, relwidth=0.2)
+create_file.place(relx=0.55, rely=0.5, relwidth=0.2)
 
 # ----------   status   ----------
 
@@ -497,5 +537,7 @@ leden1_i = Label(groep_frame, text="Vul de namen in van je groepsleden (Naam + V
 leden2_i = Label(groep_frame, text="Druk op + en - om leden toe te voegen of te verwijderen")
 
 filename_i = Label(file_frame, text="Vul de bestandsnaam in en selecteer een bestandlocatie")
+
+create_i = Label(file_frame, text="Selecteer de practicum voorberijding en klik op maak practicum")
 
 root.mainloop()
