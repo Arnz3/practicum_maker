@@ -403,6 +403,7 @@ def create_doc():
     done.pack()
     root.after(7000)
     done.destroy()
+    doc.close()
 
 
 # --------- GUI ---------
