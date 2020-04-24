@@ -136,11 +136,11 @@ def del_lid():
     global leden_aantl
     leden_aantl -= 1
     if leden_aantl == 3:
-        lid4_e.destroy()
+        lid4_e.place_forget()
     elif leden_aantl == 2:
-        lid3_e.destroy()
+        lid3_e.place_forget()
     elif leden_aantl == 1:
-        lid2_e.destroy()
+        lid2_e.place_forget()
     elif leden_aantl < 1:
         leden_aantl = 1
 
@@ -168,6 +168,7 @@ def go_back():
     vak_e.place(relx=0.25, rely=0, relwidth=0.7)
     prac_nr_e.place(relx=0.25, rely=0.14, relwidth=0.7)
     prac_titel_e.place(relx=0.25, rely=0.28, relwidth=0.7)
+    datum_e.place(relx=0.25, rely=0.42, relwidth=0.7)
     klas_e.place(relx=0.25, rely=0.56, relwidth=0.7)
     jaar_e.place(relx=0.25, rely=0.70, relwidth=0.7)
     ber.place(relx=0.25, rely=0.84)
