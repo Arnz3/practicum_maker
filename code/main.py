@@ -401,9 +401,8 @@ def create_doc():
     bussy.destroy()
     done = Label(status, text="Document klaar!")
     done.pack()
-    root.after(7000)
-    done.destroy()
-    doc.close()
+    root.after(10000)
+    root.withdraw()
 
 
 # --------- GUI ---------
